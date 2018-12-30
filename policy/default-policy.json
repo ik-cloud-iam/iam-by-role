@@ -1,0 +1,59 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": ["s3:*"],
+			"Resource": [
+				"*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kms:Decrypt",
+				"kms:Encrypt",
+				"kms:GenerateDataKey",
+				"kms:TagResource",
+				"kms:DescribeKey",
+				"kms:GetKeyPolicy",
+				"kms:GetKeyRotationStatus",
+				"kms:ListResourceTags",
+				"kms:ScheduleKeyDeletion"
+			],
+			"Resource": ["*"]
+		},
+		{
+			"Sid": "DenyAllOutsideUSIgnoreGlobals",
+			"Effect": "Deny",
+			"NotAction": [
+				"aws-portal:*",
+				"iam:*",
+				"organizations:*",
+				"support:*",
+				"sts:*",
+				"route53:*",
+				"ec2:DescribeAccountAttributes",
+				"s3:*",
+				"logs:*"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringNotEquals": {
+					"aws:RequestedRegion": ["${region}"]
+				}
+			}
+		},
+		{
+			"Sid": "DenyAllUsersNotUsingMFA",
+			"Effect": "Deny",
+			"NotAction": "*",
+			"Resource": "*",
+			"Condition": {
+				"BoolIfExists": {
+					"aws:MultiFactorAuthPresent": "false"
+				}
+			}
+		}
+	]
+}

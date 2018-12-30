@@ -1,0 +1,39 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "FullAccess",
+			"Effect": "Allow",
+			"Action": ["*"],
+			"Resource": ["*"]
+		},
+		{
+			"Sid": "DenyAllOutsideUSIgnoreGlobals",
+			"Effect": "Deny",
+			"NotAction": [
+				"aws-portal:*",
+				"iam:*",
+				"organizations:*",
+				"support:*",
+				"sts:*",
+				"route53:*",
+				"ec2:DescribeAccountAttributes",
+				"s3:*",
+				"logs:*"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringNotEquals": {
+					"aws:RequestedRegion": ["${region}"]
+				}
+			}
+		},
+		{
+			"Sid": "DenyAllUsersNotUsingMFA",
+			"Effect": "Deny",
+			"NotAction": "*",
+			"Resource": "*",
+			"Condition": { "BoolIfExists": { "aws:MultiFactorAuthPresent": "false" } }
+		}
+	]
+}

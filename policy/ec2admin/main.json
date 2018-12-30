@@ -1,0 +1,201 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:AcceptReservedInstancesExchangeQuote",
+				"ec2:AcceptVpcEndpointConnections",
+				"ec2:AcceptVpcPeeringConnection",
+				"ec2:AllocateAddress",
+				"ec2:AllocateHosts",
+				"ec2:AssignIpv6Addresses",
+				"ec2:AssignPrivateIpAddresses",
+				"ec2:AssociateAddress",
+				"ec2:AssociateDhcpOptions",
+				"ec2:AssociateIamInstanceProfile",
+				"ec2:AssociateRouteTable",
+				"ec2:AssociateSubnetCidrBlock",
+				"ec2:AssociateVpcCidrBlock",
+				"ec2:AttachClassicLinkVpc",
+				"ec2:AttachInternetGateway",
+				"ec2:AttachNetworkInterface",
+				"ec2:AttachVpnGateway",
+				"ec2:AuthorizeSecurityGroupEgress",
+				"ec2:AuthorizeSecurityGroupIngress",
+				"ec2:BundleInstance",
+				"ec2:CancelBundleTask",
+				"ec2:CancelConversionTask",
+				"ec2:CancelExportTask",
+				"ec2:CancelImportTask",
+				"ec2:CancelReservedInstancesListing",
+				"ec2:CancelSpotFleetRequests",
+				"ec2:CancelSpotInstanceRequests",
+				"ec2:ConfirmProductInstance",
+				"ec2:CopyFpgaImage",
+				"ec2:CopyImage",
+				"ec2:CopySnapshot",
+				"ec2:Create*",
+				"ec2:Delete*",
+				"ec2:DeregisterImage",
+				"ec2:Describe*",
+				"ec2:DescribeVpcs",
+				"ec2:DescribeVpnConnections",
+				"ec2:DescribeVpnGateways",
+				"ec2:DetachClassicLinkVpc",
+				"ec2:DetachInternetGateway",
+				"ec2:DetachNetworkInterface",
+				"ec2:DetachVpnGateway",
+				"ec2:DisableVgwRoutePropagation",
+				"ec2:DisableVpcClassicLink",
+				"ec2:DisableVpcClassicLinkDnsSupport",
+				"ec2:DisassociateAddress",
+				"ec2:DisassociateIamInstanceProfile",
+				"ec2:DisassociateRouteTable",
+				"ec2:DisassociateSubnetCidrBlock",
+				"ec2:DisassociateVpcCidrBlock",
+				"ec2:EnableVgwRoutePropagation",
+				"ec2:EnableVolumeIO",
+				"ec2:EnableVpcClassicLink",
+				"ec2:EnableVpcClassicLinkDnsSupport",
+				"ec2:GetConsoleOutput",
+				"ec2:GetConsoleScreenshot",
+				"ec2:GetHostReservationPurchasePreview",
+				"ec2:GetLaunchTemplateData",
+				"ec2:GetPasswordData",
+				"ec2:GetReservedInstancesExchangeQuote",
+				"ec2:Import*",
+				"ec2:Modify*",
+				"ec2:MonitorInstances",
+				"ec2:MoveAddressToVpc",
+				"ec2:PurchaseHostReservation",
+				"ec2:PurchaseReservedInstancesOffering",
+				"ec2:PurchaseScheduledInstances",
+				"ec2:RegisterImage",
+				"ec2:RejectVpcEndpointConnections",
+				"ec2:RejectVpcPeeringConnection",
+				"ec2:ReleaseAddress",
+				"ec2:ReleaseHosts",
+				"ec2:ReplaceIamInstanceProfileAssociation",
+				"ec2:ReplaceNetworkAclAssociation",
+				"ec2:ReplaceNetworkAclEntry",
+				"ec2:ReplaceRoute",
+				"ec2:ReplaceRouteTableAssociation",
+				"ec2:ReportInstanceStatus",
+				"ec2:RequestSpotFleet",
+				"ec2:RequestSpotInstances",
+				"ec2:ResetFpgaImageAttribute",
+				"ec2:ResetImageAttribute",
+				"ec2:ResetInstanceAttribute",
+				"ec2:ResetNetworkInterfaceAttribute",
+				"ec2:ResetSnapshotAttribute",
+				"ec2:RestoreAddressToClassic",
+				"ec2:RevokeSecurityGroupEgress",
+				"ec2:RevokeSecurityGroupIngress",
+				"ec2:RunScheduledInstances",
+				"ec2:UnassignIpv6Addresses",
+				"ec2:UnassignPrivateIpAddresses",
+				"ec2:UnmonitorInstances",
+				"ec2:UpdateSecurityGroupRuleDescriptionsEgress",
+				"ec2:UpdateSecurityGroupRuleDescriptionsIngress"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": "elasticloadbalancing:*",
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"cloudwatch:*",
+				"autoscaling:*",
+				"elasticloadbalancing:*",
+				"ecs:*"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "DenyTORunInstancesInOtherRegion",
+			"Effect": "Deny",
+			"NotAction": [
+				"ec2:RunInstances",
+				"ec2:StartInstances",
+				"ec2:TerminateInstances",
+				"ec2:StopInstances",
+				"ec2:StartInstances"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringNotEquals": {
+					"aws:RequestedRegion": ["us-west-2"],
+					"ec2:InstanceType": [
+						"t2.micro",
+						"t2.small",
+						"t2.medium",
+						"t3.micro",
+						"t3.small",
+						"t3.medium"
+					]
+				}
+			}
+		},
+		{
+			"Sid": "DenyTOTerminateStartandStop",
+			"Effect": "Deny",
+			"NotAction": [
+				"ec2:StartInstances",
+				"ec2:TerminateInstances",
+				"ec2:StopInstances",
+				"ec2:StartInstances"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringNotEquals": {
+					"aws:RequestedRegion": ["${region}"]
+				}
+			}
+		},
+		{
+			"Sid": "StartStopInstance",
+			"Effect": "Allow",
+			"NotAction": ["ec2:StopInstances", "ec2:StartInstances"],
+			"Resource": "*",
+			"Condition": {
+				"StringLike": {
+					"ec2:ResourceTag/Environment": ["prod", "qa", "dev", "test", "stage"]
+				}
+			}
+		},
+		{
+      "Sid" : "AllowCreatingTagsWhenCreatingVolumeLaunchingCreating",
+      "Effect": "Allow",
+			"Action": [
+				"ec2:CreateTags"
+			],
+			"Resource": "*",
+			"Condition": {
+				"StringEquals": {
+					"ec2:CreateAction": [
+						"CreateVolume",
+						"RunInstances",
+						"CreateSnapshot"
+					]
+				}
+			}
+		},
+		{
+      "Sid": "GrantAccessToKMS",
+      "Effect": "Allow",
+			"Action": [
+				"kms:Encrypt",
+				"kms:Decrypt",
+				"kms:ReEncrypt*",
+				"kms:GenerateDataKey*",
+				"kms:DescribeKey"
+			],
+			"Resource": "*"
+		}
+	]
+}
